@@ -5,12 +5,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models.signals import pre_save
 from django.utils import timezone
-from django.utils.safestring import mark_safe
-from django.utils.text import slugify
-
-from .utils import get_read_time, unique_slug_generator
 
 
 class PostManager(models.Manager):
@@ -63,14 +58,3 @@ class Post(models.Model):
         instance = self
         content_type = ContentType.objects.get_for_model(instance.__class__)
         return content_type
-
-def pre_save_post_receiver(sender, instance, *args, **kwargs):
-    if not instance.slug:
-        instance.slug = unique_slug_generator(instance)
-
-    if instance.content:
-        read_time_var = get_read_time(instance.content)
-        instance.read_time = read_time_var
-
-
-pre_save.connect(pre_save_post_receiver, sender=Post)
